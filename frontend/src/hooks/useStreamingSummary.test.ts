@@ -2,173 +2,145 @@ import { renderHook, act } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import useStreamingSummary from './useStreamingSummary'
 
-// Minimal EventSource mock
-class MockEventSource {
-  url: string
-  onmessage: ((event: MessageEvent) => void) | null = null
-  onerror: ((event: Event) => void) | null = null
-  static instances: MockEventSource[] = []
+function sseBody(tokens: string[]): string {
+  return tokens.map(t => `data: ${t}\n\n`).join('')
+}
 
-  constructor(url: string) {
-    this.url = url
-    MockEventSource.instances.push(this)
-  }
+function mockFetch(tokens: string[], status = 200): void {
+  vi.spyOn(global, 'fetch').mockResolvedValue(
+    new Response(sseBody(tokens), {
+      status,
+      headers: { 'Content-Type': 'text/event-stream' },
+    })
+  )
+}
 
-  close = vi.fn()
-
-  // Helper to simulate receiving a message
-  simulateMessage(data: string) {
-    if (this.onmessage) {
-      this.onmessage({ data } as MessageEvent)
-    }
-  }
-
-  // Helper to simulate an error
-  simulateError() {
-    if (this.onerror) {
-      this.onerror(new Event('error'))
-    }
+// Advance fake timers until the drain queue is empty (summary stops changing)
+async function drainQueue(): Promise<void> {
+  for (let i = 0; i < 500; i++) {
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(20)
+    })
   }
 }
 
 beforeEach(() => {
-  MockEventSource.instances = []
-  vi.stubGlobal('EventSource', MockEventSource)
+  vi.useFakeTimers()
+  mockFetch(['[DONE]'])
 })
 
 afterEach(() => {
-  vi.unstubAllGlobals()
+  vi.useRealTimers()
+  vi.restoreAllMocks()
 })
 
 describe('useStreamingSummary', () => {
-  it('creates EventSource at correct URL when start() is called', () => {
+  it('fetches the correct URL when start() is called', async () => {
     const { result } = renderHook(() => useStreamingSummary(42))
 
-    act(() => {
-      result.current.start()
-    })
+    await act(async () => { result.current.start() })
+    await drainQueue()
 
-    expect(MockEventSource.instances).toHaveLength(1)
-    expect(MockEventSource.instances[0].url).toBe('/api/tickets/42/summary/stream')
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/tickets/42/summary/stream',
+      expect.objectContaining({ signal: expect.any(AbortSignal) })
+    )
   })
 
-  it('sets isStreaming to true after start()', () => {
+  it('sets isStreaming to true immediately after start()', () => {
     const { result } = renderHook(() => useStreamingSummary(1))
 
-    act(() => {
-      result.current.start()
-    })
+    act(() => { result.current.start() })
 
     expect(result.current.isStreaming).toBe(true)
   })
 
-  it('accumulates tokens from message events', async () => {
+  it('accumulates tokens and reveals them via the drain queue', async () => {
+    mockFetch(['Hello', ' world', '[DONE]'])
     const { result } = renderHook(() => useStreamingSummary(1))
 
-    act(() => {
-      result.current.start()
-    })
-
-    const es = MockEventSource.instances[0]
-
-    act(() => {
-      es.simulateMessage('Hello')
-    })
-    act(() => {
-      es.simulateMessage(' world')
-    })
+    await act(async () => { result.current.start() })
+    await drainQueue()
 
     expect(result.current.summary).toBe('Hello world')
-  })
-
-  it('sets isStreaming to false when [DONE] is received', () => {
-    const { result } = renderHook(() => useStreamingSummary(1))
-
-    act(() => {
-      result.current.start()
-    })
-
-    const es = MockEventSource.instances[0]
-
-    act(() => {
-      es.simulateMessage('Some token')
-    })
-
-    act(() => {
-      es.simulateMessage('[DONE]')
-    })
-
     expect(result.current.isStreaming).toBe(false)
-    expect(es.close).toHaveBeenCalled()
   })
 
-  it('does not append [DONE] to summary text', () => {
+  it('does not append [DONE] to summary text', async () => {
+    mockFetch(['Summary text', '[DONE]'])
     const { result } = renderHook(() => useStreamingSummary(1))
 
-    act(() => {
-      result.current.start()
-    })
-
-    const es = MockEventSource.instances[0]
-
-    act(() => {
-      es.simulateMessage('Summary text')
-    })
-    act(() => {
-      es.simulateMessage('[DONE]')
-    })
+    await act(async () => { result.current.start() })
+    await drainQueue()
 
     expect(result.current.summary).toBe('Summary text')
   })
 
-  it('sets error state and stops streaming on error event', () => {
+  it('sets isStreaming to false only after the queue is fully drained', async () => {
+    mockFetch(['Hi', '[DONE]'])
     const { result } = renderHook(() => useStreamingSummary(1))
 
-    act(() => {
-      result.current.start()
-    })
+    await act(async () => { result.current.start() })
 
-    const es = MockEventSource.instances[0]
+    // After fetch resolves, isStreaming is still true (queue not empty)
+    expect(result.current.isStreaming).toBe(true)
 
-    act(() => {
-      es.simulateError()
-    })
+    // Drain two characters ("Hi")
+    await act(async () => { await vi.advanceTimersByTimeAsync(20) }) // 'H'
+    await act(async () => { await vi.advanceTimersByTimeAsync(20) }) // 'i'
+    // One more tick to see the empty queue + fetchDone → stops
+    await act(async () => { await vi.advanceTimersByTimeAsync(20) })
+
+    expect(result.current.summary).toBe('Hi')
+    expect(result.current.isStreaming).toBe(false)
+  })
+
+  it('sets error state when [ERROR] sentinel is received', async () => {
+    mockFetch(['[ERROR]'])
+    const { result } = renderHook(() => useStreamingSummary(1))
+
+    await act(async () => { result.current.start() })
+    await drainQueue()
 
     expect(result.current.error).not.toBeNull()
     expect(result.current.isStreaming).toBe(false)
-    expect(es.close).toHaveBeenCalled()
   })
 
-  it('does not open a second EventSource if already streaming', () => {
+  it('sets error state on non-ok response', async () => {
+    mockFetch([], 404)
+    const { result } = renderHook(() => useStreamingSummary(1))
+
+    await act(async () => { result.current.start() })
+    await drainQueue()
+
+    expect(result.current.error).not.toBeNull()
+    expect(result.current.isStreaming).toBe(false)
+  })
+
+  it('does not open a second stream if already streaming', async () => {
     const { result } = renderHook(() => useStreamingSummary(1))
 
     act(() => {
       result.current.start()
-      result.current.start() // second call should be a no-op
+      result.current.start() // no-op
     })
 
-    expect(MockEventSource.instances).toHaveLength(1)
+    expect(fetch).toHaveBeenCalledTimes(1)
   })
 
-  it('resets summary and error on new start()', () => {
+  it('resets summary and error on new start() after previous error', async () => {
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce(new Response('', { status: 500 }))
     const { result } = renderHook(() => useStreamingSummary(1))
 
-    // First stream
-    act(() => {
-      result.current.start()
-    })
-    const es1 = MockEventSource.instances[0]
-    act(() => {
-      es1.simulateMessage('old text')
-      es1.simulateError()
-    })
+    await act(async () => { result.current.start() })
+    await drainQueue()
 
     expect(result.current.error).not.toBeNull()
 
-    // Second stream after error
-    act(() => {
-      result.current.start()
-    })
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce(
+      new Response(sseBody(['[DONE]']), { status: 200 })
+    )
+    act(() => { result.current.start() })
 
     expect(result.current.summary).toBe('')
     expect(result.current.error).toBeNull()
