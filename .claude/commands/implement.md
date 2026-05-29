@@ -32,13 +32,14 @@ virtualenv, and database connection are available.
 
 ## After implementation
 
-1. Run `make down`
-2. Run `make up --detach` (or `docker compose up --build -d`) in background
-3. Wait 10 seconds, then run `docker compose logs --tail=50` to check for errors
-4. If no ERROR/FATAL lines appear → startup OK; proceed
-5. If errors found → fix and retry
-3. Summarize completed work, technical decisions, and any tradeoffs
-4. List remaining milestones
+1. Update the milestone doc (`docs/milestones/milestone_N_*.md`) to reflect what was actually built — actual decisions made, env var names, ports, deviations from the original spec, and any additions
+2. Run `make down`
+3. Run `docker compose up --build -d`
+4. Run `docker compose logs --tail=50` to check for errors
+5. If no ERROR/FATAL lines → startup OK; proceed
+6. If errors found → fix and retry
+7. Summarize completed work, technical decisions, and any tradeoffs
+8. List remaining milestones
 
 ## Requirements
 
