@@ -17,18 +17,22 @@ async def stream_summary(client: openai.AsyncOpenAI, ticket: Ticket) -> AsyncGen
         f"Description: {ticket.description or 'No description provided.'}\n"
     )
 
+    # extra_body with chat_template_kwargs is Qwen3/vLLM-specific; skip for standard OpenAI
+    extra: dict = (
+        {"chat_template_kwargs": {"enable_thinking": False}} if settings.llm_base_url else {}
+    )
+
     stream = await client.chat.completions.create(
         model=settings.llm_model,
         stream=True,
         messages=[
             {
                 "role": "system",
-                "content": "You are a concise technical assistant. Reply directly without any preamble or thinking.",
+                "content": "You are a concise technical assistant. Reply directly without any preamble or thinking. Always respond in the same language as the ticket content.",
             },
             {"role": "user", "content": prompt},
         ],
-        # Disable Qwen3 thinking mode if supported by the endpoint
-        extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+        extra_body=extra or None,
     )
 
     async for chunk in stream:

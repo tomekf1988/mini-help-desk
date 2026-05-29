@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.config import settings
-from app.routers import summary, tickets
+from app.routers import chat, summary, tickets
 
 # app.* loggers are not covered by uvicorn's log config — add a handler explicitly
 _app_handler = logging.StreamHandler(sys.stdout)
@@ -40,6 +40,7 @@ app = FastAPI(title="Mini Help Desk", lifespan=lifespan)
 
 app.include_router(tickets.router)
 app.include_router(summary.router)
+app.include_router(chat.router)
 
 
 @app.get("/api/health")

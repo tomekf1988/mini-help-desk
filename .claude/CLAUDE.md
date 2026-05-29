@@ -39,7 +39,8 @@ Avoid:
 * SQLAlchemy 2.x
 * PostgreSQL
 * Alembic
-* openai (LLM streaming — no LangChain)
+* openai (LLM streaming)
+* langchain-openai + langchain-core (agent tool calling)
 * httpx
 * pytest (test runner)
 * ruff (linter + formatter — replaces black/flake8)
