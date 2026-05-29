@@ -4,6 +4,7 @@ import { getAllTickets } from '../api/tickets'
 import Spinner from '../components/Spinner'
 import TicketCard from '../components/TicketCard'
 import TicketForm from '../components/TicketForm'
+import ChatPanel from '../components/ChatPanel'
 import { isOverdue, isDueThisWeek } from '../utils/dates'
 
 type StatusFilter = 'all' | TicketStatus
@@ -105,7 +106,8 @@ export default function TicketListPage() {
     statusFilter !== 'all' || priorityFilter !== 'all' || dueFilter !== 'all'
 
   return (
-    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+      <div style={{ flex: 1, overflowY: 'auto', minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Sticky header */}
       <div
         style={{
@@ -259,6 +261,8 @@ export default function TicketListPage() {
           )}
         </div>
       </div>
+      </div>
+      <ChatPanel onTicketsUpdated={loadTickets} />
     </div>
   )
 }

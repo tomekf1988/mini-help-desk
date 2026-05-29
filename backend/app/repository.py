@@ -1,9 +1,10 @@
 import uuid
+from datetime import date
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import Ticket, TicketStatus, _utcnow
+from app.models import Ticket, TicketPriority, TicketStatus, _utcnow
 from app.schemas import TicketCreate, TicketUpdate
 
 
@@ -40,3 +41,22 @@ def update_ticket(db: Session, ticket: Ticket, data: TicketUpdate) -> Ticket:
 def delete_ticket(db: Session, ticket: Ticket) -> None:
     db.delete(ticket)
     db.commit()
+
+
+def search_tickets(
+    db: Session,
+    title: str | None = None,
+    status: TicketStatus | None = None,
+    priority: TicketPriority | None = None,
+    due_date: date | None = None,
+) -> list[Ticket]:
+    q = select(Ticket)
+    if title:
+        q = q.where(Ticket.title.ilike(f"%{title}%"))
+    if status:
+        q = q.where(Ticket.status == status)
+    if priority:
+        q = q.where(Ticket.priority == priority)
+    if due_date:
+        q = q.where(Ticket.due_date == due_date)
+    return list(db.scalars(q.order_by(Ticket.created_at.desc())))

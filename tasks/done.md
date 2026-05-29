@@ -118,3 +118,34 @@
 - [x] Verified: `make up-for-dev` — db healthy, backend ran migrations, uvicorn started; no ERROR/FATAL
 - [x] Verified: `make down` — clean shutdown
 - [x] docs/milestones/milestone_7_db_config.md updated
+
+## Milestone 8 — Agent Backend: Tool Calling & Chat SSE
+
+- [x] backend/app/events.py — `SSEEvent` dataclass with `.to_sse()` producing `data: <json>\n\n`
+- [x] backend/app/prompts/__init__.py — empty package marker
+- [x] backend/app/prompts/assistant.md — prompt template file with `{today}`, `{tomorrow}`, `{create_ticket_examples}`, `{search_tickets_examples}`
+- [x] backend/app/prompts/assistant.py — `get_system_prompt()` via `PromptTemplate.from_file()` (LangChain refactor)
+- [x] backend/app/agent_tools.py — `@tool`-decorated `create_ticket_tool` / `search_tickets_tool`; self-contained `SessionLocal` sessions; `CREATE_TICKET_EXAMPLES` / `SEARCH_TICKETS_EXAMPLES` constants
+- [x] backend/app/database.py — added module-level `SessionLocal` for tools
+- [x] backend/app/repository.py — added `search_tickets()` with dynamic WHERE filters (title ilike, status, priority, due_date)
+- [x] backend/app/agent_service.py — `run_agent_stream(messages)` using `ChatOpenAI` + `bind_tools` + `astream` (LangChain refactor)
+- [x] backend/app/schemas.py — added `ChatMessage`, `ChatRequest`
+- [x] backend/app/routers/chat.py — `POST /api/chat/stream` SSE endpoint; no `app.state` dependencies
+- [x] backend/app/main.py — chat router included
+- [x] backend/pyproject.toml — added `langchain-openai>=0.3` and `langchain-core>=0.3`
+- [x] backend/tests/test_chat_stream.py — 4 tests; `api_client` fixture no longer sets `app.state` stubs
+- [x] pytest — 24/24 passed
+- [x] ruff check — All checks passed
+- [x] mypy — Success: no issues found in 20 source files
+- [x] Startup verified — no ERROR/FATAL in backend logs
+- [x] docs/milestones/milestone_8_agent_backend.md updated
+
+## Milestone 9 — Chat UI Frontend
+
+- [x] Modify `frontend/src/types.ts` — added `CreatedTicket`, `ChatMessage`, `SSEEvent` types
+- [x] Create `frontend/src/hooks/useChat.ts` — fetch-based SSE hook with sessionStorage history; no `id` on ChatMessage
+- [x] Create `frontend/src/components/ChatPanel.tsx` — 360px sidebar; uses `StatusBadge` and `PriorityBadge` instead of inline pills
+- [x] Modify `frontend/src/pages/TicketListPage.tsx` — wrapped in flex row, `ChatPanel` added on right with `onTicketsUpdated={loadTickets}`
+- [x] Create `frontend/src/test/ChatPanel.test.tsx` — 7 tests; all pass
+- [x] All 20 frontend tests pass
+- [x] docs/milestones/milestone_9_chat_ui.md updated

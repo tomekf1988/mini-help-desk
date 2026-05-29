@@ -35,3 +35,12 @@ class TicketResponse(BaseModel):
     due_date: date | None
     created_at: datetime
     updated_at: datetime
+
+
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+
+class ChatRequest(BaseModel):
+    messages: list[ChatMessage]
