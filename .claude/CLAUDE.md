@@ -63,6 +63,9 @@ Avoid:
 * SSE endpoint: `GET /api/tickets/{id}/summary/stream` — token events + `[DONE]`
 * `useStreamingSummary` guards start on `esRef.current`, not stale `isStreaming` state
 * Inline styles only in frontend (no CSS modules, no Tailwind)
+* All datetimes are naive UTC — `DateTime` column (not timezone-aware); `_utcnow()` strips tzinfo
+* `updated_at` uses ORM-level `onupdate` — bulk `session.execute(update(...))` must set it explicitly
+* Ticket status enum values: `open`, `in_progress`, `closed` (not `resolved`)
 
 ## Streaming
 

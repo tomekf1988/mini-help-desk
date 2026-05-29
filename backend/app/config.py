@@ -6,7 +6,5 @@ class Settings(BaseSettings):
     test_database_url: str = ""
     llm_api_key: str = ""
 
-    model_config = {"env_file": ".env"}
-
 
 settings = Settings()
