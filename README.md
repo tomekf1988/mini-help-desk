@@ -128,6 +128,8 @@ If I had another few hours, I would start with JWT authentication and user owner
 
 I would also introduce a shared contract (e.g. a typed schema or a simple constants file) for SSE event formats between the backend and frontend — currently both sides agree on `data: <token>\n\n` and the `[DONE]` sentinel by convention only, which is fragile as the protocol evolves.
 
+The codebase structure is intentionally kept flat and demo-style. A production version would benefit from a clearer separation: dedicated repository layer, stricter service boundaries, and split routers per domain.
+
 One feature I did have time to plan and implement as a bonus: a mini chat agent with tools that can create and search tickets via natural language. It is available on the [`extra_milestone`](../../tree/extra_milestone) branch.
 
 ---
@@ -138,7 +140,7 @@ Approximately 3 hours.
 
 The biggest time sink was local setup. I initially started with my own database and API configuration before switching to the credentials provided in the assignment.
 
-## Running tests
+## Running tests *(development only)*
 
 Tests use SQLite in-memory — no postgres required, no external dependencies.
 
