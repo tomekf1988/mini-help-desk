@@ -2,7 +2,7 @@
 
 check-env:
 	@missing=0; \
-	for var in MINI_HELP_DESK_PORT_PREFIX MINI_HELP_DESK_DB_NAME MINI_HELP_DESK_DB_USER MINI_HELP_DESK_DB_PASSWORD LLM_API_KEY; do \
+	for var in MINI_HELP_DESK_PORT_PREFIX MINI_HELP_DESK_DB_NAME MINI_HELP_DESK_DB_USER MINI_HELP_DESK_DB_PASSWORD MINI_HELP_DESK_DB_HOST LLM_API_KEY; do \
 		val=$$(grep -E "^$$var=" .env 2>/dev/null | cut -d= -f2-); \
 		if [ -z "$$val" ]; then \
 			echo "ERROR: $$var is not set. See .env.example."; \
@@ -18,10 +18,10 @@ up-for-dev: check-env
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 
 down:
-	docker compose down
+	docker compose -f docker-compose.yml -f docker-compose.dev.yml down
 
 logs:
-	docker compose logs -f
+	docker compose -f docker-compose.yml -f docker-compose.dev.yml logs -f
 
 build:
 	docker compose build
