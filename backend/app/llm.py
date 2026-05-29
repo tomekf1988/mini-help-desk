@@ -20,7 +20,15 @@ async def stream_summary(client: openai.AsyncOpenAI, ticket: Ticket) -> AsyncGen
     stream = await client.chat.completions.create(
         model=settings.llm_model,
         stream=True,
-        messages=[{"role": "user", "content": prompt}],
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a concise technical assistant. Reply directly without any preamble or thinking.",
+            },
+            {"role": "user", "content": prompt},
+        ],
+        # Disable Qwen3 thinking mode if supported by the endpoint
+        extra_body={"chat_template_kwargs": {"enable_thinking": False}},
     )
 
     async for chunk in stream:

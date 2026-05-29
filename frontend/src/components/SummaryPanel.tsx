@@ -18,6 +18,8 @@ const labelStyle: React.CSSProperties = {
 export default function SummaryPanel({ ticketId }: SummaryPanelProps) {
   const { summary, isStreaming, error, start } = useStreamingSummary(ticketId)
 
+  const showOutput = isStreaming || summary.length > 0
+
   return (
     <div style={{ borderTop: '1px solid #DFE1E6', paddingTop: 16 }}>
       <label style={labelStyle}>AI Summary</label>
@@ -38,38 +40,13 @@ export default function SummaryPanel({ ticketId }: SummaryPanelProps) {
           fontFamily: 'inherit',
           cursor: isStreaming ? 'not-allowed' : 'pointer',
           width: '100%',
-          marginBottom: summary || isStreaming || error ? 12 : 0,
+          marginBottom: showOutput || error ? 12 : 0,
         }}
       >
         {isStreaming ? 'Generating…' : 'Generate Summary'}
       </button>
 
-      {isStreaming && !summary && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            color: '#6B778C',
-            fontSize: 13,
-          }}
-        >
-          <div
-            style={{
-              width: 14,
-              height: 14,
-              borderRadius: '50%',
-              border: '2px solid #DFE1E6',
-              borderTopColor: '#0052CC',
-              animation: 'spin 0.7s linear infinite',
-              flexShrink: 0,
-            }}
-          />
-          Generating summary…
-        </div>
-      )}
-
-      {summary && (
+      {showOutput && (
         <div
           style={{
             background: '#F4F5F7',
@@ -80,6 +57,7 @@ export default function SummaryPanel({ ticketId }: SummaryPanelProps) {
             lineHeight: 1.6,
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
+            minHeight: 36,
           }}
         >
           {summary}
@@ -90,9 +68,9 @@ export default function SummaryPanel({ ticketId }: SummaryPanelProps) {
                 width: 2,
                 height: '1em',
                 background: '#0052CC',
-                marginLeft: 2,
+                marginLeft: 1,
                 verticalAlign: 'text-bottom',
-                animation: 'blink 1s step-end infinite',
+                animation: 'blink 0.8s step-end infinite',
               }}
             />
           )}

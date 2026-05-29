@@ -1,4 +1,6 @@
 from contextlib import asynccontextmanager
+import logging
+import sys
 
 import openai
 from fastapi import FastAPI
@@ -8,6 +10,13 @@ from sqlalchemy.orm import sessionmaker
 from app.config import settings
 from app.routers import summary, tickets
 
+# app.* loggers are not covered by uvicorn's log config — add a handler explicitly
+_app_handler = logging.StreamHandler(sys.stdout)
+_app_handler.setFormatter(logging.Formatter("%(levelname)-8s %(name)s - %(message)s"))
+logging.getLogger("app").setLevel(logging.INFO)
+logging.getLogger("app").addHandler(_app_handler)
+logging.getLogger("app").propagate = False
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -15,12 +24,15 @@ async def lifespan(app: FastAPI):
     engine = create_engine(settings.database_url)
     app.state.session_factory = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     # LLM
-    kwargs: dict[str, str] = {"api_key": settings.llm_api_key}
     if settings.llm_base_url:
-        kwargs["base_url"] = settings.llm_base_url
-    app.state.llm_client = openai.AsyncOpenAI(**kwargs)
+        app.state.llm_client = openai.AsyncOpenAI(
+            api_key=settings.llm_api_key,
+            base_url=settings.llm_base_url,
+        )
+    else:
+        app.state.llm_client = openai.AsyncOpenAI(api_key=settings.llm_api_key)
     yield
-    await app.state.llm_client.aclose()
+    await app.state.llm_client.close()
     engine.dispose()
 
 

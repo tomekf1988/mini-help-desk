@@ -87,3 +87,24 @@
 - [x] frontend/src/hooks/useStreamingSummary.test.ts — 8 tests: URL, start, tokens, [DONE], error, double-start guard, reset; all pass
 - [x] All 12 frontend tests pass
 - [x] Startup verified — make down && docker compose up --build -d; no ERROR/FATAL in logs
+
+## Milestone 6 — Finalization and Delivery
+
+- [x] docker-compose.yml — MINI_HELP_DESK_DB_HOST in DATABASE_URL; LLM_BASE_URL + LLM_MODEL passed to backend; TEST_DATABASE_URL removed
+- [x] backend/app/config.py — removed test_database_url; type: ignore[call-arg] for pydantic-settings
+- [x] backend/app/main.py — explicit if/else for AsyncOpenAI init (fixes mypy **kwargs error)
+- [x] backend/app/seed.py — seed_if_empty(db) + __main__ block for standalone invocation via python -m app.seed
+- [x] backend/scripts/seed.py — thin wrapper delegating to app.seed (no duplication)
+- [x] backend/tests/conftest.py — SQLite in-memory fixtures: db_engine, db_session, client, api_client
+- [x] backend/tests/test_tickets_api.py — removed postgres-specific fixtures; uses conftest
+- [x] backend/tests/test_summary_stream.py — removed postgres-specific fixtures; local api_client stubs LLM
+- [x] .env.example — MINI_HELP_DESK_DB_HOST, LLM_BASE_URL, LLM_MODEL with comments
+- [x] Makefile — seed uses python -m app.seed; MINI_HELP_DESK_DB_HOST optional (has default)
+- [x] README.md — prerequisites, env vars table, commands, test instructions
+- [x] docs/milestones/milestone_6_finalization_and_delivery.md updated
+- [x] docs/reviews/milestone_6_review.md — critical: make seed broken + scripts/seed.py broken; both fixed
+- [x] ruff check — clean
+- [x] mypy — no issues (0 errors)
+- [x] pytest — 20/20 passed (SQLite in-memory)
+- [x] npm test — 12/12 passed
+- [x] npm run build — clean (181 kB bundle)

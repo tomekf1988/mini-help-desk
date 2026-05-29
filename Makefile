@@ -24,7 +24,7 @@ build:
 	docker compose build
 
 seed:
-	docker compose exec backend python -c "from app.database import SessionLocal; from app.seed import seed_if_empty; db = SessionLocal(); seed_if_empty(db); db.close()"
+	docker compose exec backend python -m app.seed
 
 reset:
 	docker compose down -v

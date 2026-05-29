@@ -20,9 +20,10 @@ services:
     build: ./backend
     env_file: .env
     environment:
-      DATABASE_URL: postgresql://${MINI_HELP_DESK_DB_USER}:${MINI_HELP_DESK_DB_PASSWORD}@db:5432/${MINI_HELP_DESK_DB_NAME}
-      TEST_DATABASE_URL: postgresql://${MINI_HELP_DESK_DB_USER}:${MINI_HELP_DESK_DB_PASSWORD}@db:5432/${MINI_HELP_DESK_DB_NAME}_test
+      DATABASE_URL: postgresql://${MINI_HELP_DESK_DB_USER}:${MINI_HELP_DESK_DB_PASSWORD}@${MINI_HELP_DESK_DB_HOST:-db}:5432/${MINI_HELP_DESK_DB_NAME}
       LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+      LLM_MODEL: ${LLM_MODEL:-gpt-4.1-mini}
     ports:
       - "${MINI_HELP_DESK_PORT_PREFIX}8000:8000"
     volumes:

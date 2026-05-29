@@ -1,67 +1,10 @@
-"""Tests for the Ticket model against the real test database."""
+"""Tests for the Ticket model using SQLite in-memory database."""
 import uuid
 from datetime import date, datetime
 
-import pytest
-from sqlalchemy import create_engine, text
-from sqlalchemy.engine import make_url
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session
 
-from app.config import settings
-from app.database import Base
 from app.models import Ticket, TicketPriority, TicketStatus
-
-
-def _test_db_url() -> str:
-    return settings.test_database_url or settings.database_url
-
-
-def _ensure_test_db_exists(url: str) -> None:
-    parsed = make_url(url)
-    db_name = parsed.database
-    admin_url = parsed.set(database="postgres")
-    admin_engine = create_engine(admin_url, isolation_level="AUTOCOMMIT")
-    with admin_engine.connect() as conn:
-        exists = conn.execute(
-            text("SELECT 1 FROM pg_database WHERE datname = :name"),
-            {"name": db_name},
-        ).scalar()
-        if not exists:
-            conn.execute(text(f'CREATE DATABASE "{db_name}"'))
-    admin_engine.dispose()
-
-
-@pytest.fixture(scope="session")
-def db_engine():
-    url = _test_db_url()
-    _ensure_test_db_exists(url)
-    engine = create_engine(url)
-
-    with engine.connect() as conn:
-        conn.execute(text("DROP TABLE IF EXISTS tickets CASCADE"))
-        conn.execute(text("DROP TYPE IF EXISTS ticketstatus CASCADE"))
-        conn.execute(text("DROP TYPE IF EXISTS ticketpriority CASCADE"))
-        conn.commit()
-
-    Base.metadata.create_all(engine)
-    yield engine
-    Base.metadata.drop_all(engine)
-    engine.dispose()
-
-
-@pytest.fixture
-def db_session(db_engine):
-    """Each test gets a transaction that is rolled back after the test."""
-    connection = db_engine.connect()
-    transaction = connection.begin()
-    factory = sessionmaker(bind=connection)
-    session: Session = factory()
-
-    yield session
-
-    session.close()
-    transaction.rollback()
-    connection.close()
 
 
 def test_insert_and_query_ticket(db_session: Session) -> None:

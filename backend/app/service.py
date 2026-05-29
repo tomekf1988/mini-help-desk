@@ -54,10 +54,21 @@ _logger = logging.getLogger(__name__)
 async def stream_summary_events(
     client: openai.AsyncOpenAI, ticket: Ticket
 ) -> AsyncGenerator[str, None]:
+    _logger.info("SSE stream started: ticket %s (%r)", ticket.id, ticket.title)
+    accumulated: list[str] = []
     try:
         async for token in llm.stream_summary(client, ticket):
+            _logger.debug("SSE token #%d: %r", len(accumulated) + 1, token)
+            accumulated.append(token)
             yield f"data: {token}\n\n"
+        full_text = "".join(accumulated)
+        _logger.info(
+            "SSE stream done: ticket %s — %d tokens — %r",
+            ticket.id,
+            len(accumulated),
+            full_text[:120] + ("…" if len(full_text) > 120 else ""),
+        )
         yield "data: [DONE]\n\n"
     except Exception:
-        _logger.exception("LLM streaming error for ticket %s", ticket.id)
+        _logger.exception("SSE stream error: ticket %s", ticket.id)
         yield "data: [ERROR]\n\n"
