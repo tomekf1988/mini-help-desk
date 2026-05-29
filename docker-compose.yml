@@ -40,6 +40,7 @@ services:
     env_file: .env
     environment:
       VITE_API_URL: http://localhost:${MINI_HELP_DESK_PORT_PREFIX}8000
+      BACKEND_URL: http://backend:8000
     ports:
       - "${MINI_HELP_DESK_PORT_PREFIX}5173:5173"
     volumes:
