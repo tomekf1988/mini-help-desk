@@ -1,4 +1,4 @@
-.PHONY: check-env up down logs build seed reset
+.PHONY: check-env up up-for-dev down logs build seed seed-force reset reset-dev
 
 check-env:
 	@missing=0; \
@@ -14,6 +14,9 @@ check-env:
 up: check-env
 	docker compose up --build
 
+up-for-dev: check-env
+	docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+
 down:
 	docker compose down
 
@@ -26,5 +29,11 @@ build:
 seed:
 	docker compose exec backend python -m app.seed
 
+seed-force:
+	docker compose exec backend python -m app.seed --force
+
 reset:
 	docker compose down -v
+
+reset-dev:
+	docker compose -f docker-compose.yml -f docker-compose.dev.yml down -v
