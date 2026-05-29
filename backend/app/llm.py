@@ -6,6 +6,14 @@ import openai
 from app.config import settings
 from app.models import Ticket
 
+# Models that require thinking mode to be disabled via chat_template_kwargs
+_NO_THINKING_MODELS = {
+    "unsloth/Qwen3.5-9B",
+    "Qwen/Qwen3-8B",
+    "Qwen/Qwen3-14B",
+    "Qwen/Qwen3-32B",
+}
+
 
 async def stream_summary(client: openai.AsyncOpenAI, ticket: Ticket) -> AsyncGenerator[str, None]:
     """Stream a concise AI-generated summary of a ticket token by token."""
@@ -17,6 +25,10 @@ async def stream_summary(client: openai.AsyncOpenAI, ticket: Ticket) -> AsyncGen
         f"Description: {ticket.description or 'No description provided.'}\n"
     )
 
+    extra: dict = {}
+    if settings.llm_model in _NO_THINKING_MODELS:
+        extra = {"extra_body": {"chat_template_kwargs": {"enable_thinking": False}}}
+
     stream = await client.chat.completions.create(
         model=settings.llm_model,
         stream=True,
@@ -27,8 +39,7 @@ async def stream_summary(client: openai.AsyncOpenAI, ticket: Ticket) -> AsyncGen
             },
             {"role": "user", "content": prompt},
         ],
-        # Disable Qwen3 thinking mode if supported by the endpoint
-        extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+        **extra,
     )
 
     async for chunk in stream:

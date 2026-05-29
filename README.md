@@ -19,7 +19,7 @@ A minimal help desk application with AI-powered ticket summaries.
    ```bash
    make up
    ```
-4. Seed sample data:
+4. *(Optional)* Seed sample data:
    ```bash
    make seed
    ```
