@@ -32,3 +32,19 @@
 - [x] Startup verified — make down && docker compose up --build -d; no ERROR/FATAL in logs
 - [x] All tests pass — 6/6 (test_health + 5 model tests)
 - [x] docs/milestones/milestone_2_database_and_data_model.md updated
+
+## Milestone 3 — Core CRUD API
+
+- [x] backend/app/errors.py — NotFoundError(Exception) with resource_id attribute
+- [x] backend/app/schemas.py — TicketCreate, TicketUpdate, TicketResponse (Pydantic v2, from_attributes=True)
+- [x] backend/app/repository.py — get_ticket, list_tickets, create_ticket, update_ticket, delete_ticket (SQLAlchemy 2.x)
+- [x] backend/app/service.py — business logic layer, raises NotFoundError, no FastAPI imports
+- [x] backend/app/routers/__init__.py — empty package init
+- [x] backend/app/routers/tickets.py — FastAPI router, 5 endpoints, NotFoundError → 404
+- [x] backend/app/main.py — updated to include tickets router
+- [x] backend/tests/test_tickets_api.py — 11 tests, full CRUD cycle, 404s, status filter
+- [x] ruff check — All checks passed
+- [x] mypy — 0 new errors (1 pre-existing in config.py from milestone 2)
+- [x] pytest — 17/17 passed
+- [x] Startup verified — make down && docker compose up --build -d; no ERROR/FATAL in logs
+- [x] docs/milestones/milestone_3_core_crud_api.md updated
