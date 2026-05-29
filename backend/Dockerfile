@@ -15,6 +15,7 @@ COPY app/ app/
 COPY alembic/ alembic/
 COPY alembic.ini .
 COPY tests/ tests/
+COPY scripts/ scripts/
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
 

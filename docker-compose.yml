@@ -22,11 +22,14 @@ services:
     environment:
       DATABASE_URL: postgresql://${MINI_HELP_DESK_DB_USER}:${MINI_HELP_DESK_DB_PASSWORD}@db:5432/${MINI_HELP_DESK_DB_NAME}
       TEST_DATABASE_URL: postgresql://${MINI_HELP_DESK_DB_USER}:${MINI_HELP_DESK_DB_PASSWORD}@db:5432/${MINI_HELP_DESK_DB_NAME}_test
+      LLM_API_KEY: ${LLM_API_KEY:-}
     ports:
       - "${MINI_HELP_DESK_PORT_PREFIX}8000:8000"
     volumes:
       - ./backend/app:/app/app
       - ./backend/tests:/app/tests
+      - ./backend/scripts:/app/scripts
+      - ./backend/alembic:/app/alembic
     depends_on:
       db:
         condition: service_healthy
