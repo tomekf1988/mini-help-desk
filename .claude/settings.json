@@ -1,0 +1,10 @@
+{
+  "model": "claude-sonnet-4-6",
+  "permissions": {
+    "allow": [
+      "Read(/Users/tomaszfabian/PyCharmMiscProject/mini-help-desk/**)",
+      "Edit(/Users/tomaszfabian/PyCharmMiscProject/mini-help-desk/**)",
+      "Write(/Users/tomaszfabian/PyCharmMiscProject/mini-help-desk/**)"
+    ]
+  }
+}
