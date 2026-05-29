@@ -15,9 +15,9 @@ A minimal help desk application with AI-powered ticket summaries.
    cp .env.example .env
    # edit .env — set LLM_API_KEY, LLM_BASE_URL, LLM_MODEL (and optionally adjust DB vars)
    ```
-3. Start all services (includes a local Postgres container):
+3. Start all services:
    ```bash
-   make up-for-dev
+   make up
    ```
 4. Seed sample data:
    ```bash
@@ -44,8 +44,8 @@ A minimal help desk application with AI-powered ticket summaries.
 ## Commands
 
 ```bash
-make up           # build and start backend+frontend only (expects external Postgres)
-make up-for-dev   # build and start all services including a local Postgres container
+make up           # build and start all services
+make up-for-dev   # same as up but also spins up a local Postgres container
 make down         # stop all services
 make logs         # tail logs
 make build        # rebuild images
