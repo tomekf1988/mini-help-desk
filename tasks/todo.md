@@ -1,14 +1,5 @@
 # TODO
 
-## Milestone 4 — Frontend List and Detail
-
-- [ ] frontend/src/pages/TicketList.tsx — list page with status filter
-- [ ] frontend/src/pages/TicketDetail.tsx — detail page
-- [ ] frontend/src/components/ — shared UI components
-- [ ] frontend/src/api/tickets.ts — API client functions
-- [ ] Frontend routing setup
-- [ ] Basic frontend tests
-
 ## Milestone 5 — LLM Integration and Streaming
 
 - [ ] GET /api/tickets/{id}/summary/stream — SSE endpoint

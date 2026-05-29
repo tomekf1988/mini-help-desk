@@ -48,3 +48,24 @@
 - [x] pytest — 17/17 passed
 - [x] Startup verified — make down && docker compose up --build -d; no ERROR/FATAL in logs
 - [x] docs/milestones/milestone_3_core_crud_api.md updated
+
+## Milestone 4 — Frontend List and Detail
+
+- [x] frontend/src/index.css — global reset + font + background
+- [x] frontend/src/types.ts — Ticket, TicketStatus, TicketPriority types
+- [x] frontend/src/api/tickets.ts — getAllTickets, getTicketById, createTicket, updateTicket
+- [x] frontend/src/components/Layout.tsx — full-height wrapper
+- [x] frontend/src/components/Spinner.tsx — loading spinner with CSS animation
+- [x] frontend/src/components/StatusBadge.tsx — color-coded status pill (open/in_progress/closed)
+- [x] frontend/src/components/TicketCard.tsx — row with priority/status badge, hover state, navigates to detail
+- [x] frontend/src/components/TicketForm.tsx — create ticket form with focus ring, grid layout, submit button
+- [x] frontend/src/pages/TicketListPage.tsx — Backlog list with pill filters (status/priority/due) + embedded create form
+- [x] frontend/src/pages/TicketDetailPage.tsx — two-column layout, editable sidebar, status cycle, AI summary placeholder
+- [x] frontend/src/pages/TicketCreatePage.tsx — standalone create page wrapping TicketForm
+- [x] frontend/src/App.tsx — ErrorBoundary + Routes: /, /tickets/new, /tickets/:id
+- [x] frontend/src/main.tsx — imports index.css
+- [x] frontend/src/test/setup.ts — @testing-library/jest-dom import
+- [x] frontend/src/test/TicketListPage.test.tsx — 3 tests: renders tickets, empty state, form submit POST
+- [x] frontend/src/test/TicketCreatePage.test.tsx — 1 test: form submit calls POST /api/tickets
+- [x] vite.config.ts — setupFiles: ['./src/test/setup.ts']
+- [x] All 4 tests pass, TypeScript build clean
