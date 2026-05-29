@@ -1,9 +1,14 @@
+import logging
 import uuid
+from typing import AsyncGenerator
+
+import openai
 
 from sqlalchemy.orm import Session
 
 from app.errors import NotFoundError
 from app.models import Ticket, TicketStatus
+from app import llm
 from app.repository import (
     create_ticket as repo_create,
     delete_ticket as repo_delete,
@@ -41,3 +46,18 @@ def delete_ticket(db: Session, ticket_id: uuid.UUID) -> None:
     if ticket is None:
         raise NotFoundError(ticket_id)
     repo_delete(db, ticket)
+
+
+_logger = logging.getLogger(__name__)
+
+
+async def stream_summary_events(
+    client: openai.AsyncOpenAI, ticket: Ticket
+) -> AsyncGenerator[str, None]:
+    try:
+        async for token in llm.stream_summary(client, ticket):
+            yield f"data: {token}\n\n"
+        yield "data: [DONE]\n\n"
+    except Exception:
+        _logger.exception("LLM streaming error for ticket %s", ticket.id)
+        yield "data: [ERROR]\n\n"

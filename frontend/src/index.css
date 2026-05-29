@@ -14,3 +14,7 @@ html, body, #root {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+@keyframes blink {
+  50% { opacity: 0; }
+}

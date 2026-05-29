@@ -69,3 +69,21 @@
 - [x] frontend/src/test/TicketCreatePage.test.tsx — 1 test: form submit calls POST /api/tickets
 - [x] vite.config.ts — setupFiles: ['./src/test/setup.ts']
 - [x] All 4 tests pass, TypeScript build clean
+
+## Milestone 5 — LLM Integration & Streaming
+
+### Backend
+- [x] backend/app/config.py — added llm_model (default "gpt-4.1-mini"), llm_base_url (default ""); env vars LLM_MODEL, LLM_BASE_URL
+- [x] backend/app/llm.py — async generator stream_summary(ticket); AsyncOpenAI with api_key=llm_api_key, conditional base_url; skips None delta chunks
+- [x] backend/app/routers/summary.py — GET /api/tickets/{id}/summary/stream; upfront 404 check; StreamingResponse; Cache-Control + X-Accel-Buffering headers
+- [x] backend/app/main.py — summary router included
+- [x] backend/tests/test_summary_stream.py — 3 tests: SSE events, 404 for missing, cache-control headers; all pass
+- [x] All 20 backend tests pass
+
+### Frontend
+- [x] frontend/src/hooks/useStreamingSummary.ts — EventSource hook, guards on esRef.current, accumulates tokens, [DONE] closes stream
+- [x] frontend/src/components/SummaryPanel.tsx — "Generate Summary" button + live streaming text display + spinner + error state
+- [x] frontend/src/pages/TicketDetailPage.tsx — AI Summary placeholder replaced with SummaryPanel
+- [x] frontend/src/hooks/useStreamingSummary.test.ts — 8 tests: URL, start, tokens, [DONE], error, double-start guard, reset; all pass
+- [x] All 12 frontend tests pass
+- [x] Startup verified — make down && docker compose up --build -d; no ERROR/FATAL in logs
