@@ -5,6 +5,7 @@ import { getTicketById, updateTicket } from '../api/tickets'
 import Spinner from '../components/Spinner'
 import StatusBadge from '../components/StatusBadge'
 import PriorityBadge from '../components/PriorityBadge'
+import SummaryPanel from '../components/SummaryPanel'
 import { isOverdue } from '../utils/dates'
 
 const STATUS_CYCLE: TicketStatus[] = ['open', 'in_progress', 'closed']
@@ -377,26 +378,8 @@ export default function TicketDetailPage() {
               )}
             </div>
 
-            {/* AI Summary placeholder */}
-            <div style={{ borderTop: '1px solid #DFE1E6', paddingTop: 16 }}>
-              <label style={labelStyle}>AI Summary</label>
-              <button
-                disabled
-                style={{
-                  background: '#F4F5F7',
-                  color: '#6B778C',
-                  border: '1.5px solid #DFE1E6',
-                  borderRadius: 8,
-                  padding: '8px 12px',
-                  fontSize: 13,
-                  fontFamily: 'inherit',
-                  cursor: 'not-allowed',
-                  width: '100%',
-                }}
-              >
-                Available in next milestone
-              </button>
-            </div>
+            {/* AI Summary */}
+            <SummaryPanel ticketId={ticket.id} />
           </div>
         </div>
       ) : null}
