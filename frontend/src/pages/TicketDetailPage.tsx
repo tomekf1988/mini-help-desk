@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import type { Ticket, TicketStatus, TicketPriority } from '../types'
-import { getTicketById, updateTicket } from '../api/tickets'
+import { getTicketById, updateTicket, deleteTicket } from '../api/tickets'
 import Spinner from '../components/Spinner'
 import StatusBadge from '../components/StatusBadge'
 import PriorityBadge from '../components/PriorityBadge'
@@ -55,6 +55,10 @@ export default function TicketDetailPage() {
   const [savedMessage, setSavedMessage] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
 
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+
   useEffect(() => {
     if (!id) return
     setLoading(true)
@@ -106,6 +110,19 @@ export default function TicketDetailPage() {
       setSaveError(err instanceof Error ? err.message : 'Failed to save')
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handleDelete() {
+    if (!ticket || deleting) return
+    setDeleting(true)
+    setDeleteError(null)
+    try {
+      await deleteTicket(ticket.id)
+      navigate('/')
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : 'Failed to delete')
+      setDeleting(false)
     }
   }
 
@@ -375,6 +392,78 @@ export default function TicketDetailPage() {
                 <span style={{ fontSize: 13, color: '#DE350B', textAlign: 'center' }}>
                   {saveError}
                 </span>
+              )}
+            </div>
+
+            {/* Delete */}
+            <div style={{ borderTop: '1px solid #DFE1E6', paddingTop: 16 }}>
+              {!confirmDelete ? (
+                <button
+                  onClick={() => setConfirmDelete(true)}
+                  style={{
+                    background: 'none',
+                    border: '1.5px solid #DE350B',
+                    borderRadius: 8,
+                    padding: '8px',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: '#DE350B',
+                    fontFamily: 'inherit',
+                    cursor: 'pointer',
+                    width: '100%',
+                  }}
+                >
+                  Delete Ticket
+                </button>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <span style={{ fontSize: 12, color: '#172B4D', textAlign: 'center' }}>
+                    Are you sure? This cannot be undone.
+                  </span>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      onClick={() => void handleDelete()}
+                      disabled={deleting}
+                      style={{
+                        flex: 1,
+                        background: '#DE350B',
+                        border: 'none',
+                        borderRadius: 8,
+                        padding: '8px',
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: '#fff',
+                        fontFamily: 'inherit',
+                        cursor: deleting ? 'not-allowed' : 'pointer',
+                      }}
+                    >
+                      {deleting ? 'Deleting…' : 'Confirm'}
+                    </button>
+                    <button
+                      onClick={() => setConfirmDelete(false)}
+                      disabled={deleting}
+                      style={{
+                        flex: 1,
+                        background: 'none',
+                        border: '1.5px solid #DFE1E6',
+                        borderRadius: 8,
+                        padding: '8px',
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: '#6B778C',
+                        fontFamily: 'inherit',
+                        cursor: deleting ? 'not-allowed' : 'pointer',
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  {deleteError && (
+                    <span style={{ fontSize: 12, color: '#DE350B', textAlign: 'center' }}>
+                      {deleteError}
+                    </span>
+                  )}
+                </div>
               )}
             </div>
 

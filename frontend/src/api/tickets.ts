@@ -50,3 +50,8 @@ export async function updateTicket(id: string, data: UpdateTicketData): Promise<
   if (!res.ok) throw new Error(`Failed to update ticket: ${res.status}`)
   return res.json()
 }
+
+export async function deleteTicket(id: string): Promise<void> {
+  const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' })
+  if (!res.ok) throw new Error(`Failed to delete ticket: ${res.status}`)
+}
