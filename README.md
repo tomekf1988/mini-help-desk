@@ -126,6 +126,8 @@ To stay within the time limit I intentionally skipped:
 
 If I had another few hours, I would start with JWT authentication and user ownership of tickets, then add pagination and project-level organization.
 
+I would also introduce a shared contract (e.g. a typed schema or a simple constants file) for SSE event formats between the backend and frontend — currently both sides agree on `data: <token>\n\n` and the `[DONE]` sentinel by convention only, which is fragile as the protocol evolves.
+
 One feature I did have time to plan and implement as a bonus: a mini chat agent with tools that can create and search tickets via natural language. It is available on the [`extra_milestone`](../../tree/extra_milestone) branch.
 
 ---
