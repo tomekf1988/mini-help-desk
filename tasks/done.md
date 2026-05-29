@@ -108,3 +108,13 @@
 - [x] pytest — 20/20 passed (SQLite in-memory)
 - [x] npm test — 12/12 passed
 - [x] npm run build — clean (181 kB bundle)
+
+## Milestone 7 — Docker Compose Split: External DB vs Local Dev DB
+
+- [x] docker-compose.yml — removed `db` service, `depends_on`, and `volumes: db_data`; updated `DATABASE_URL` to use `${MINI_HELP_DESK_DB_HOST}:${MINI_HELP_DESK_DB_PORT:-5432}`
+- [x] docker-compose.dev.yml — new file; `db` service (postgres:16) + backend `DATABASE_URL` override (`@db:5432`) + `depends_on: db (service_healthy)` + `volumes: db_data`
+- [x] Makefile — added `up-for-dev` and `reset-dev` targets; updated `.PHONY`
+- [x] .env.example — added `MINI_HELP_DESK_DB_PORT=5432`; updated `MINI_HELP_DESK_DB_HOST` comment
+- [x] Verified: `make up-for-dev` — db healthy, backend ran migrations, uvicorn started; no ERROR/FATAL
+- [x] Verified: `make down` — clean shutdown
+- [x] docs/milestones/milestone_7_db_config.md updated

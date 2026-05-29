@@ -1,26 +1,9 @@
 services:
-  db:
-    image: postgres:16
-    env_file: .env
-    environment:
-      POSTGRES_DB: ${MINI_HELP_DESK_DB_NAME}
-      POSTGRES_USER: ${MINI_HELP_DESK_DB_USER}
-      POSTGRES_PASSWORD: ${MINI_HELP_DESK_DB_PASSWORD}
-    ports:
-      - "${MINI_HELP_DESK_PORT_PREFIX}5432:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${MINI_HELP_DESK_DB_USER} -d ${MINI_HELP_DESK_DB_NAME}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
   backend:
     build: ./backend
     env_file: .env
     environment:
-      DATABASE_URL: postgresql://${MINI_HELP_DESK_DB_USER}:${MINI_HELP_DESK_DB_PASSWORD}@${MINI_HELP_DESK_DB_HOST:-db}:5432/${MINI_HELP_DESK_DB_NAME}
+      DATABASE_URL: postgresql://${MINI_HELP_DESK_DB_USER}:${MINI_HELP_DESK_DB_PASSWORD}@${MINI_HELP_DESK_DB_HOST}:${MINI_HELP_DESK_DB_PORT:-5432}/${MINI_HELP_DESK_DB_NAME}
       LLM_API_KEY: ${LLM_API_KEY:-}
       LLM_BASE_URL: ${LLM_BASE_URL:-}
       LLM_MODEL: ${LLM_MODEL:-gpt-4.1-mini}
@@ -31,9 +14,6 @@ services:
       - ./backend/tests:/app/tests
       - ./backend/scripts:/app/scripts
       - ./backend/alembic:/app/alembic
-    depends_on:
-      db:
-        condition: service_healthy
 
   frontend:
     build:
@@ -46,6 +26,3 @@ services:
       - "${MINI_HELP_DESK_PORT_PREFIX}5173:5173"
     volumes:
       - ./frontend/src:/app/src
-
-volumes:
-  db_data:

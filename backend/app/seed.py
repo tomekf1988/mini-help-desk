@@ -55,20 +55,32 @@ def seed_if_empty(db: Session) -> None:
     if existing is not None:
         print("Already seeded, skipping")
         return
+    _insert(db)
+
+
+def force_seed(db: Session) -> None:
+    db.query(Ticket).delete()
+    db.commit()
+    _insert(db)
+
+
+def _insert(db: Session) -> None:
     db.add_all([Ticket(**data) for data in _SAMPLE_TICKETS])
     db.commit()
     print(f"Seeded {len(_SAMPLE_TICKETS)} tickets")
 
 
 if __name__ == "__main__":
+    import sys
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker as _sessionmaker
     from app.config import settings
 
+    _force = "--force" in sys.argv or "-f" in sys.argv
     _engine = create_engine(settings.database_url)
     _db = _sessionmaker(bind=_engine)()
     try:
-        seed_if_empty(_db)
+        force_seed(_db) if _force else seed_if_empty(_db)
     finally:
         _db.close()
         _engine.dispose()
