@@ -13,7 +13,7 @@ A minimal help desk application with AI-powered ticket summaries.
 2. Copy the env template and fill in your LLM credentials:
    ```bash
    cp .env.example .env
-   # edit .env — set LLM_API_KEY (and optionally LLM_BASE_URL, LLM_MODEL)
+   # edit .env — set LLM_API_KEY, LLM_BASE_URL, LLM_MODEL (and optionally adjust DB vars)
    ```
 3. Start all services (includes a local Postgres container):
    ```bash
@@ -38,8 +38,8 @@ A minimal help desk application with AI-powered ticket summaries.
 | `MINI_HELP_DESK_DB_HOST` | `db` | Postgres hostname (Docker-internal default) |
 | `MINI_HELP_DESK_DB_PORT` | `5432` | Postgres port |
 | `LLM_API_KEY` | — | API key for the LLM service (**required**) |
-| `LLM_BASE_URL` | *(OpenAI default)* | Custom base URL for OpenAI-compatible endpoints |
-| `LLM_MODEL` | `gpt-4.1-mini` | Model name to use for ticket summaries |
+| `LLM_BASE_URL` | — | Base URL for OpenAI-compatible endpoint (**required**) |
+| `LLM_MODEL` | `unsloth/Qwen3.5-9B` | Model name (**required**) |
 
 ## Commands
 
