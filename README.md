@@ -15,7 +15,7 @@ A minimal help desk application with AI-powered ticket summaries.
    cp .env.example .env
    # edit .env — set LLM_API_KEY and adjust DB vars
    # LLM_BASE_URL is optional (leave empty to use standard OpenAI API)
-   # LLM_MODEL defaults to gpt-4o-mini
+   # LLM_MODEL
    ```
 3. Start all services:
    ```bash
