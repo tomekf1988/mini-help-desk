@@ -62,8 +62,7 @@ make reset-dev    # same as reset but also removes dev compose volumes
 
 ### 1. AI Dev Stack — what tools and models were used?
 
-I used Claude Code with the Sonnet 4.6 model throughout the assignment. It helped with implementation, refactoring, test generation, and code reviews. I still reviewed the generated code and made architectural decisions manually.
-
+I used Claude Code with the Sonnet 4.6 model throughout the assignment. It helped with implementation, refactoring, test generation, and code reviews. In addition to Claude Code, I occasionally used ChatGPT and referenced a few of my previous projects for common setup tasks. For example, I reused Docker configuration patterns that I had already established in earlier Python and React applications.
 ---
 
 ### 2. API discovery — how was the model name found?
@@ -104,6 +103,10 @@ For larger datasets I would:
 - use PostgreSQL full-text search (`tsvector` + GIN index),
 - consider a dedicated search engine (Elasitc Search for example) only if search requirements became significantly more advanced.
 
+- Allow custom statuses and priorities instead of hardcoded enums. This would let teams configure their own workflow without code changes.
+- Introduce a `projects` table and allow tickets to be grouped by project.
+- Add users and ticket ownership so tickets can be assigned to specific people.
+
 ---
 
 ### 5. Credentials — how were secrets handled?
@@ -139,6 +142,8 @@ One feature I did have time to plan and implement as a bonus: a mini chat agent 
 Approximately 3 hours.
 
 The biggest time sink was local setup. I initially started with my own database and API configuration before switching to the credentials provided in the assignment.
+After switching from my own model configuration to the model provided in the assignment, the application felt noticeably slower. I spent some time investigating the cause and found that disabling reasoning mode (`enable_thinking=False`) significantly improved response times for the summarization use case.
+Since the application only needed short ticket summaries rather than complex reasoning, disabling thinking provided a better user experience with faster streaming responses.
 
 ## Running tests *(development only)*
 
