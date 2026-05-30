@@ -139,7 +139,10 @@ One feature I did have time to plan and implement as a bonus: a mini chat agent 
 
 ### 7. Time spent
 
-Approximately 3 hours.
+
+Approximately 3 hours to reach the first fully working version of the application, including the backend, frontend, database integration, and LLM-powered streaming summaries.
+
+The discussion answers, minor fixes, cleanup work, and an experimental AI chat agent branch were completed after the initial 3-hour implementation window. The chat agent was built as a separate experiment and is not part of the assignment requirements.
 
 The biggest time sink was local setup. I initially started with my own database and API configuration before switching to the credentials provided in the assignment.
 After switching from my own model configuration to the model provided in the assignment, the application felt noticeably slower. I spent some time investigating the cause and found that disabling reasoning mode (`enable_thinking=False`) significantly improved response times for the summarization use case.
